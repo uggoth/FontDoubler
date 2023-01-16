@@ -1,6 +1,6 @@
-module_name = 'FontDoubler_V02.py'
+module_name = 'FontDoubler_V04.py'
 
-import RP2040_LCD_CLOCK_V01 as Display
+import RP2040_LCD_CLOCK_V02 as Display
 
 class LCD2(Display.LCD_1inch28):
     def __init__(self):
@@ -8,7 +8,7 @@ class LCD2(Display.LCD_1inch28):
         self.base_font_width = 8
         self.base_font_height = 8
         self.max_scale = 8
-        self.max_characters = 8
+        self.max_characters = 20
         self.work_height = self.base_font_height
         self.work_width = self.base_font_width * self.max_characters
         self.work_buffer = bytearray(self.work_height * self.work_width * 2)
@@ -20,16 +20,22 @@ class LCD2(Display.LCD_1inch28):
         self.blue   =  0xf800
         self.purple =  0xffe0
         self.white  =  0xffff
+        self.black  =  0x0000
     def scaled(self, text, x, y, background, foreground, scale=1, padding=0):
         result = 0
+        w = len(text)
+        if w > self.max_characters:
+            result = 40
+            w = self.max_characters
+        if w < 1:
+            return 50
         s = scale
         if s > self.max_scale:
             s = self.max_scale
-            result = 2
-        w = len(text)
-        if w > self.max_characters:
-            result = 1
-            w = self.max_characters
+            result = 20
+        if s < 1:
+            s = 1
+            result = 30
         rect_width = w * self.base_font_width * s
         rect_height = self.base_font_height * s
         self.work_area.fill_rect(0,0,rect_width,rect_height,background)
@@ -53,8 +59,9 @@ class LCD2(Display.LCD_1inch28):
 if __name__ == '__main__':
     print (module_name, 'starting')
     my_lcd = LCD2()
-    left = 20
-    top = 75
-    print (my_lcd.scaled('Hello',left,top,my_lcd.blue,my_lcd.yellow,5,3))
-    print (my_lcd.scaled('World',left,top+50,my_lcd.blue,my_lcd.purple,5,3))
+    my_lcd.fill(my_lcd.black)
+    print (my_lcd.scaled('Colin',35,40,my_lcd.black,my_lcd.yellow,4,3))
+    print (my_lcd.scaled('Walls',35,80,my_lcd.black,my_lcd.yellow,4,3))
+    print (my_lcd.scaled('Sidmouth',20,140,my_lcd.black,my_lcd.red,3,3))
+    print (my_lcd.scaled('Robots',40,170,my_lcd.black,my_lcd.red,3,3))
     print (module_name, 'finished')
